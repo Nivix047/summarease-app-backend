@@ -1,0 +1,61 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+
+# Django
+*.sqlite3
+/db.sqlite3
+*.pot
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+staticfiles/
+media/
+*.env
+.env
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.Python
+
+# VSCode
+.vscode/
+.history/
+
+# MacOS
+.DS_Store
+
+# JetBrains (PyCharm)
+.idea/
+
+# Logs
+*.log
+
+# Node
+node_modules/
+
+# Postgres
+*.pgpass
+
+# Ignore migrations
+migrations/
+
+# Secrets
+secrets.json
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
