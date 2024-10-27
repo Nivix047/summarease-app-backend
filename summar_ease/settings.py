@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
+    'pdfs',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',  # Add this for CORS handling
