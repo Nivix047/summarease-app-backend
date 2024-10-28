@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from .models import CustomUser
+from pdfs.serializers import PDFDocumentSerializer
 from django.contrib.auth.password_validation import validate_password
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
+    pdf_documents = PDFDocumentSerializer(many=True, read_only=True)
 
     class Meta:
         model = CustomUser

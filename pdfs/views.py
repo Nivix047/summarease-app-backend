@@ -37,4 +37,4 @@ class PDFDocumentViewSet(viewsets.ModelViewSet):
         return Response({"error": "Failed to extract text from PDF."}, status=status.HTTP_400_BAD_REQUEST)
 
     logger.error("Title and file are required.")
-    return Response({"error": "Title and file are required"}, status=HTTP_400_BAD_REQUEST)
+    return Response({"error": "Title and file are required"}, status=status.HTTP_400_BAD_REQUEST)
