@@ -8,7 +8,7 @@ class PDFDocument(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pdf_documents')
   title = models.CharField(max_length=255)
-  file= models.FileField(upload_to='pdfs/')
+  public_id = models.CharField(max_length=255, blank=True, null=True)
   summary = models.TextField(blank=True, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
 
