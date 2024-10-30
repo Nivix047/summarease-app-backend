@@ -2,6 +2,8 @@ import nltk
 import PyPDF2
 import openai
 import os
+import requests
+import tempfile
 from collections import deque
 from sacremoses import MosesDetokenizer
 from dotenv import load_dotenv
@@ -16,14 +18,29 @@ try:
 except LookupError:
     nltk.download('punkt')
 
-def extract_text_from_pdf(pdf_path):
+def extract_text_from_pdf(pdf_url):
     try:
-        with open(pdf_path, 'rb') as pdf_file_obj:
-            pdf_reader = PyPDF2.PdfReader(pdf_file_obj)
-            text = ""
-            for page_num in range(len(pdf_reader.pages)):
-                page_obj = pdf_reader.pages[page_num]
-                text += page_obj.extract_text() or ""
+        # Check if the PDF URL is accessible
+        response = requests.get(pdf_url)
+        if response.status_code == 200:
+            print("PDF is accessible.")
+        else:
+            print("PDF is not accessible, status code:", response.status_code)
+            return None  # Early return if the PDF is not accessible
+
+        # Create a temporary file
+        with tempfile.NamedTemporaryFile(delete=True) as temp_file:
+            temp_file.write(response.content)  # Write the downloaded content to the temp file
+            temp_file.flush()  # Ensure the file is written before processing
+            
+            # Extract text from the PDF
+            with open(temp_file.name, 'rb') as pdf_file_obj:
+                pdf_reader = PyPDF2.PdfReader(pdf_file_obj)
+                text = ""
+                for page_num in range(len(pdf_reader.pages)):
+                    page_obj = pdf_reader.pages[page_num]
+                    text += page_obj.extract_text() or ""
+        
         if not text:
             print("Warning: No text was extracted from the PDF.")
         else:

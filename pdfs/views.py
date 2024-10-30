@@ -1,6 +1,4 @@
 import logging
-import tempfile
-import os
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -11,42 +9,38 @@ from .pdf_summarizer import extract_text_from_pdf, recursively_summarize
 logger = logging.getLogger(__name__)
 
 class PDFDocumentViewSet(viewsets.ModelViewSet):
-  queryset = PDFDocument.objects.all()
-  serializer_class = PDFDocumentSerializer
-  permission_classes = [IsAuthenticated]
+    queryset = PDFDocument.objects.all()
+    serializer_class = PDFDocumentSerializer
+    permission_classes = [IsAuthenticated]
 
-  def perform_create(self, serializer):
-    user = self.request.user
-    title = self.request.data.get('title')
-    pdf_file = self.request.FILES.get('file')
+    def perform_create(self, serializer):
+        user = self.request.user
+        title = self.request.data.get('title')
+        public_id = self.request.data.get('public_id')
+        file_url = self.request.data.get('file_url')
 
-    if title and pdf_file:
-      # Save the PDF document
-      pdf_document = serializer.save(user=user, title=title, public_id=None)
+        if title and public_id and file_url:
+            # Save the PDF document
+            pdf_document = serializer.save(user=user, title=title, public_id=public_id)
 
-      # Create a temporary file to save the uploaded PDF
-      with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_file:
-        for chunk in pdf_file.chunks():
-          temp_file.write(chunk)
-        temp_file_path = temp_file.name
+            # Extract text from the PDF file at the given URL
+            text = extract_text_from_pdf(file_url)  # Use the URL directly
 
-      # Extract text and summarize using the temporary file path
-      text = extract_text_from_pdf(temp_file_path)
+            if text:
+                summary = recursively_summarize(text)
+                pdf_document.summary = summary
+                pdf_document.save()
+                logger.info("PDF summarized successfully.")
 
-      if text:
-        summary = recursively_summarize(text)
-        pdf_document.summary = summary
-        pdf_document.save()
-        logger.info("PDF summarized successfully.")
+                return Response({
+                    'summary': summary,
+                    'id': pdf_document.id,
+                    'url': file_url,
+                    'title': pdf_document.title
+                }, status=status.HTTP_201_CREATED)
 
-        # Clean up the temporary file after use
-        os.remove(temp_file_path)
+            logger.error("Failed to extract text from PDF.")
+            return Response({"error": "Failed to extract text from PDF."}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'summary': summary, 'id': pdf_document.id}, status=status.HTTP_201_CREATED)
-      else:
-        logger.error("Failed to extract text from PDF")
-        os.remove(temp_file_path)
-        return Response({"error": "Failed to extract text from PDF."}, status=status.HTTP_400_BAD_REQUEST)
-
-    logger.error("Title and file are required.")
-    return Response({"error": "Title and file are required"}, status=status.HTTP_400_BAD_REQUEST)
+        logger.error("Title, public_id, and file_url are required.")
+        return Response({"error": "Title, public_id, and file_url are required."}, status=status.HTTP_400_BAD_REQUEST)
