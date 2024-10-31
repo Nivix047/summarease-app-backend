@@ -19,8 +19,7 @@ INSTALLED_APPS = [
     'pdfs',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders',  # Add this for CORS handling
-    'social_django',
+    'corsheaders',  # CORS handling
 ]
 
 MIDDLEWARE = [
@@ -32,7 +31,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'summar_ease.urls'
@@ -48,8 +46,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -57,7 +53,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'summar_ease.wsgi.application'
 
-# Database configuration with connection pooling (optional)
+# Database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -66,7 +62,7 @@ DATABASES = {
         'PASSWORD': config("DATABASE_PASSWORD"),
         'HOST': config("DATABASE_HOST"),
         'PORT': config("DATABASE_PORT"),
-        'ATOMIC_REQUESTS': True,  # Enable transactional requests
+        'ATOMIC_REQUESTS': True,
     }
 }
 
@@ -78,12 +74,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.github.GithubOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
-
-SOCIAL_AUTH_GITHUB_KEY = config('GITHUB_CLIENT_ID')
-SOCIAL_AUTH_GITHUB_SECRET = config('GITHUB_CLIENT_SECRET')
 
 LOGIN_REDIRECT_URL = 'http://localhost:3000/dashboard'
 LOGOUT_REDIRECT_URL = '/'
@@ -109,13 +101,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.UserRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'login': '5/min',  # Throttle login attempts
-        'user': '10/min',
-    },
 }
 
 # CORS configuration
