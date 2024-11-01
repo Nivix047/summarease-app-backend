@@ -32,12 +32,7 @@ class PDFDocumentViewSet(viewsets.ModelViewSet):
                 pdf_document.save()
                 logger.info("PDF summarized successfully.")
 
-                return Response({
-                    'summary': summary,
-                    'id': pdf_document.id,
-                    'url': file_url,
-                    'title': pdf_document.title
-                }, status=status.HTTP_201_CREATED)
+                return Response(status=status.HTTP_201_CREATED)
 
             logger.error("Failed to extract text from PDF.")
             return Response({"error": "Failed to extract text from PDF."}, status=status.HTTP_400_BAD_REQUEST)
