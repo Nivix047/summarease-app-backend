@@ -33,6 +33,20 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key, 'user_id': user.pk}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['GET'], permission_classes=[IsAuthenticated])
+    def user_info(self, request, pk=None):
+        logger.info(f"Authenticated user ID: {request.user.pk} (type: {type(request.user.pk)}), Requested user ID: {pk} (type: {type(pk)})")
+        # Check if the authenticated user matches the requested user ID
+        if str(request.user.pk) != str(pk):
+            return Response({"error": "You do not have permission to access this user's information."}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = CustomUser.objects.get(pk=pk)
+            logger.info(f"Retrieved user: {user}")
+            serializer = CustomUserSerializer(user)
+            return Response(serializer.data)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
