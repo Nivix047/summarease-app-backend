@@ -9,7 +9,7 @@ from .pdf_summarizer import extract_text_from_pdf, recursively_summarize
 logger = logging.getLogger(__name__)
 
 class PDFDocumentViewSet(viewsets.ModelViewSet):
-    queryset = PDFDocument.objects.all()
+    queryset = PDFDocument.objects.all().all().order_by('-created_at')
     serializer_class = PDFDocumentSerializer
     permission_classes = [IsAuthenticated]
 
