@@ -120,11 +120,11 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'DEBUG' if DEBUG else 'ERROR',
+            'level': 'INFO',
         },
         'users': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'WARNING',
         },
     },
 }
